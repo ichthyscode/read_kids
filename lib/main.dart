@@ -182,91 +182,100 @@ class ReadingGamePageState extends State<ReadingGamePage> {
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Punktestand: $score',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 22),
-            ),
-            const SizedBox(height: 40),
-            if (flashcards.isNotEmpty)
-              RichText(
-                text: TextSpan(
-                  style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 142, fontWeight: FontWeight.bold),
-                  children: colorizeSyllables(flashcards[0].text, colors),
-                ),
-              )
-            else
-              const Text(
-                'Alle Karten gelesen!',
-                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+        child: GestureDetector(
+          onHorizontalDragEnd: (details) {
+            if (details.primaryVelocity! < 0) {
+              swipeLeft();
+            } else if (details.primaryVelocity! > 0) {
+              swipeRight();
+            }
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Punktestand: $score',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 22),
               ),
-            const SizedBox(height: 60),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: swipeLeft,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.tertiary,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              const SizedBox(height: 40),
+              if (flashcards.isNotEmpty)
+                RichText(
+                  text: TextSpan(
+                    style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 142, fontWeight: FontWeight.bold),
+                    children: colorizeSyllables(flashcards[0].text, colors),
                   ),
-                  child: const Text(
-                    'Falsch',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                )
+              else
+                const Text(
+                  'Alle Karten gelesen!',
+                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: swipeRight,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              const SizedBox(height: 60),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: swipeLeft,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.tertiary,
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                    ),
+                    child: const Text(
+                      'Falsch',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                  child: const Text(
-                    'Richtig',
-                    style: TextStyle(color: Colors.white),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    onPressed: swipeRight,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                    ),
+                    child: const Text(
+                      'Richtig',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: repeatIncorrect,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-              ),
-              child: const Text(
-                'Falsche wiederholen',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            if (lastPoints != null)
-              Animate(
-                effects: const [
-                  FadeEffect(duration: Duration(milliseconds: 500)),
-                  ScaleEffect(begin: Offset(0.5, 0.5), end: Offset(1.5, 1.5), duration: Duration(milliseconds: 500)),
-                  MoveEffect(begin: Offset(0, 50), end: Offset(0, -50), duration: Duration(milliseconds: 500)),
                 ],
-                onComplete: (controller) {
-                  setState(() {
-                    lastPoints = null;
-                  });
-                },
-                child: Text(
-                  lastPoints!,
-                  style: TextStyle(
-                    fontSize: 64,
-                    fontWeight: FontWeight.bold,
-                    color: lastPoints!.startsWith('+')
-                        ? Colors.green[700]
-                        : Colors.red[700],
-                  ),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: repeatIncorrect,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                ),
+                child: const Text(
+                  'Falsche wiederholen',
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
-          ],
+              if (lastPoints != null)
+                Animate(
+                  effects: const [
+                    FadeEffect(duration: Duration(milliseconds: 500)),
+                    ScaleEffect(begin: Offset(0.5, 0.5), end: Offset(1.5, 1.5), duration: Duration(milliseconds: 500)),
+                    MoveEffect(begin: Offset(0, 50), end: Offset(0, -50), duration: Duration(milliseconds: 500)),
+                  ],
+                  onComplete: (controller) {
+                    setState(() {
+                      lastPoints = null;
+                    });
+                  },
+                  child: Text(
+                    lastPoints!,
+                    style: TextStyle(
+                      fontSize: 64,
+                      fontWeight: FontWeight.bold,
+                      color: lastPoints!.startsWith('+')
+                          ? Colors.green[700]
+                          : Colors.red[700],
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
