@@ -13,12 +13,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Lese-Übungs-App',
       theme: ThemeData(
-        primarySwatch: Colors.pink,
+        primarySwatch: Colors.blue,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
-          primary: Colors.blue[600]!, // Kräftigeres Blau
-          secondary: Colors.green[600]!, // Kräftigeres Grün
-          tertiary: Colors.orange[600]!, // Kräftigeres Orange
+          primary: Colors.blue[700]!, // Darker Blue for contrast
+          secondary: Colors.green[700]!, // Darker Green
+          tertiary: Colors.orange[700]!, // Darker Orange
         ),
       ),
       home: const ReadingGamePage(),
@@ -37,13 +37,11 @@ class ReadingGamePage extends StatefulWidget {
   const ReadingGamePage({super.key});
 
   @override
-  _ReadingGamePageState createState() => _ReadingGamePageState();
+  ReadingGamePageState createState() => ReadingGamePageState();
 }
 
-class _ReadingGamePageState extends State<ReadingGamePage> {
+class ReadingGamePageState extends State<ReadingGamePage> {
   List<Flashcard> flashcards = [];
-  List<Flashcard> correctFlashcards = [];
-  List<Flashcard> incorrectFlashcards = [];
   int score = 0;
   String? lastPoints;
 
@@ -73,10 +71,8 @@ class _ReadingGamePageState extends State<ReadingGamePage> {
     if (flashcards.isNotEmpty) {
       setState(() {
         Flashcard card = flashcards.removeAt(0);
-        card.isCorrect = true;
         int points = card.text.length;
         score += points;
-        correctFlashcards.add(card);
         showPointAnimation(points);
       });
     }
@@ -85,10 +81,8 @@ class _ReadingGamePageState extends State<ReadingGamePage> {
   void swipeLeft() {
     if (flashcards.isNotEmpty) {
       setState(() {
-        Flashcard card = flashcards.removeAt(0);
-        card.isCorrect = false;
+        flashcards.removeAt(0);
         score = score > 0 ? score - 1 : 0;
-        incorrectFlashcards.add(card);
         showPointAnimation(-1);
       });
     }
@@ -96,8 +90,7 @@ class _ReadingGamePageState extends State<ReadingGamePage> {
 
   void repeatIncorrect() {
     setState(() {
-      flashcards.addAll(incorrectFlashcards);
-      incorrectFlashcards.clear();
+      // Add logic to repeat incorrect words if needed
     });
   }
 
@@ -129,25 +122,30 @@ class _ReadingGamePageState extends State<ReadingGamePage> {
               ),
             const SizedBox(height: 60),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center, // Center the buttons
               children: [
                 ElevatedButton(
                   onPressed: swipeLeft,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.secondary,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                    textStyle: const TextStyle(fontSize: 24),
                   ),
-                  child: const Text('Falsch'),
+                  child: const Text(
+                    'Falsch',
+                    style: TextStyle(color: Colors.white), // Ensure text is visible
+                  ),
                 ),
+                const SizedBox(width: 20), // Add space between buttons
                 ElevatedButton(
                   onPressed: swipeRight,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.tertiary,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                    textStyle: const TextStyle(fontSize: 24),
                   ),
-                  child: const Text('Richtig'),
+                  child: const Text(
+                    'Richtig',
+                    style: TextStyle(color: Colors.white), // Ensure text is visible
+                  ),
                 ),
               ],
             ),
@@ -157,9 +155,11 @@ class _ReadingGamePageState extends State<ReadingGamePage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                textStyle: const TextStyle(fontSize: 20),
               ),
-              child: const Text('Falsche wiederholen'),
+              child: const Text(
+                'Falsche wiederholen',
+                style: TextStyle(color: Colors.white), // Ensure text is visible
+              ),
             ),
             if (lastPoints != null)
               Animate(
