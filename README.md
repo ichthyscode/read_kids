@@ -1,5 +1,7 @@
 # Reading Practice App
 
+![App Screenshot](assets/screenshot1.png)
+
 ## Purpose
 
 This Flutter application is designed to help children practice and improve their reading skills in German. It provides a fun, interactive way for young learners to engage with words, enhancing their vocabulary and reading fluency.
