@@ -209,7 +209,7 @@ class ReadingGamePageState extends State<ReadingGamePage> {
                 ElevatedButton(
                   onPressed: swipeLeft,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                   ),
                   child: const Text(
@@ -221,7 +221,7 @@ class ReadingGamePageState extends State<ReadingGamePage> {
                 ElevatedButton(
                   onPressed: swipeRight,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                   ),
                   child: const Text(
