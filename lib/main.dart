@@ -187,13 +187,13 @@ class ReadingGamePageState extends State<ReadingGamePage> {
           children: <Widget>[
             Text(
               'Punktestand: $score',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 28),
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 22),
             ),
             const SizedBox(height: 40),
             if (flashcards.isNotEmpty)
               RichText(
                 text: TextSpan(
-                  style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 72, fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 142, fontWeight: FontWeight.bold),
                   children: colorizeSyllables(flashcards[0].text, colors),
                 ),
               )
