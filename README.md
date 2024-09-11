@@ -1,4 +1,4 @@
-Reading Practice App
+# Reading Practice App
 
 ## Purpose
 
