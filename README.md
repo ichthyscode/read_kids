@@ -1,4 +1,4 @@
-# Lese-Übungs-App (Reading Practice App)
+Reading Practice App
 
 ## Purpose
 
