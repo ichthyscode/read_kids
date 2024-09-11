@@ -16,9 +16,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
-          primary: Colors.blue[700]!, // Darker Blue for contrast
-          secondary: Colors.green[700]!, // Darker Green
-          tertiary: Colors.orange[700]!, // Darker Orange
+          primary: Colors.blue[700]!,
+          secondary: Colors.green[700]!,
+          tertiary: Colors.orange[700]!,
         ),
       ),
       home: const ReadingGamePage(),
@@ -42,6 +42,8 @@ class ReadingGamePage extends StatefulWidget {
 
 class ReadingGamePageState extends State<ReadingGamePage> {
   List<Flashcard> flashcards = [];
+  List<Flashcard> correctFlashcards = [];
+  List<Flashcard> incorrectFlashcards = [];
   int score = 0;
   String? lastPoints;
 
@@ -58,7 +60,72 @@ class ReadingGamePageState extends State<ReadingGamePage> {
       Flashcard("Haus"),
       Flashcard("Baum"),
       Flashcard("Schule"),
+      Flashcard("Kindergarten"),
     ];
+  }
+
+  List<int> findSyllablePositions(String word) {
+    List<int> positions = [];
+    String vowels = 'aeiouäöü';
+    String connections = 'sch,ch,ph,ck,pf,br,pl,tr,st,gr';
+    int length = word.length;
+
+    if (length > 2) {
+      bool canSplit = false;
+
+      for (int i = 1; i < length - 1; i++) {
+        String z0 = word[i - 1];
+        if (!canSplit && vowels.contains(z0)) {
+          canSplit = true;
+        }
+
+        if (canSplit) {
+          String z = word[i];
+          String z1 = word[i + 1];
+          String v = z0 + z;
+
+          if (v == 'ch' && i > 1 && word[i - 2] == 's') {
+            v = 'sch';
+          }
+
+          if (vowels.contains(z1) && !vowels.contains(z)) {
+            if (connections.contains(v)) {
+              positions.add(i - v.length + 1);
+            } else {
+              positions.add(i);
+            }
+          }
+        }
+      }
+    }
+
+    return positions;
+  }
+
+  List<String> splitIntoSyllables(String word) {
+    List<int> positions = findSyllablePositions(word);
+    List<String> syllables = [];
+    int start = 0;
+
+    for (int pos in positions) {
+      syllables.add(word.substring(start, pos));
+      start = pos;
+    }
+    syllables.add(word.substring(start));
+
+    return syllables;
+  }
+
+  List<TextSpan> colorizeSyllables(String word, List<Color> colors) {
+    List<String> syllables = splitIntoSyllables(word);
+    List<TextSpan> spans = [];
+    for (int i = 0; i < syllables.length; i++) {
+      spans.add(TextSpan(
+        text: syllables[i],
+        style: TextStyle(color: colors[i % colors.length]),
+      ));
+    }
+    return spans;
   }
 
   void showPointAnimation(int points) {
@@ -71,8 +138,10 @@ class ReadingGamePageState extends State<ReadingGamePage> {
     if (flashcards.isNotEmpty) {
       setState(() {
         Flashcard card = flashcards.removeAt(0);
+        card.isCorrect = true;
         int points = card.text.length;
         score += points;
+        correctFlashcards.add(card);
         showPointAnimation(points);
       });
     }
@@ -81,8 +150,10 @@ class ReadingGamePageState extends State<ReadingGamePage> {
   void swipeLeft() {
     if (flashcards.isNotEmpty) {
       setState(() {
-        flashcards.removeAt(0);
+        Flashcard card = flashcards.removeAt(0);
+        card.isCorrect = false;
         score = score > 0 ? score - 1 : 0;
+        incorrectFlashcards.add(card);
         showPointAnimation(-1);
       });
     }
@@ -90,12 +161,21 @@ class ReadingGamePageState extends State<ReadingGamePage> {
 
   void repeatIncorrect() {
     setState(() {
-      // Add logic to repeat incorrect words if needed
+      if (incorrectFlashcards.isNotEmpty) {
+        flashcards.addAll(incorrectFlashcards);
+        incorrectFlashcards.clear();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = [
+      Theme.of(context).colorScheme.primary,
+      Theme.of(context).colorScheme.secondary,
+      Theme.of(context).colorScheme.tertiary
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lese-Übungs-App'),
@@ -111,9 +191,11 @@ class ReadingGamePageState extends State<ReadingGamePage> {
             ),
             const SizedBox(height: 40),
             if (flashcards.isNotEmpty)
-              Text(
-                flashcards[0].text,
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 72, fontWeight: FontWeight.bold),
+              RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 72, fontWeight: FontWeight.bold),
+                  children: colorizeSyllables(flashcards[0].text, colors),
+                ),
               )
             else
               const Text(
@@ -122,7 +204,7 @@ class ReadingGamePageState extends State<ReadingGamePage> {
               ),
             const SizedBox(height: 60),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Center the buttons
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: swipeLeft,
@@ -132,10 +214,10 @@ class ReadingGamePageState extends State<ReadingGamePage> {
                   ),
                   child: const Text(
                     'Falsch',
-                    style: TextStyle(color: Colors.white), // Ensure text is visible
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
-                const SizedBox(width: 20), // Add space between buttons
+                const SizedBox(width: 20),
                 ElevatedButton(
                   onPressed: swipeRight,
                   style: ElevatedButton.styleFrom(
@@ -144,7 +226,7 @@ class ReadingGamePageState extends State<ReadingGamePage> {
                   ),
                   child: const Text(
                     'Richtig',
-                    style: TextStyle(color: Colors.white), // Ensure text is visible
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
@@ -158,7 +240,7 @@ class ReadingGamePageState extends State<ReadingGamePage> {
               ),
               child: const Text(
                 'Falsche wiederholen',
-                style: TextStyle(color: Colors.white), // Ensure text is visible
+                style: TextStyle(color: Colors.white),
               ),
             ),
             if (lastPoints != null)
